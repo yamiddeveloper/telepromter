@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Teleprompter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ============ EDITOR ============ -->
+  <main id="editor" class="editor">
+    <aside class="library">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <h1>Teleprompter</h1>
+      </div>
+      <button id="newScript" class="btn btn-ghost full">+ Nuevo guion</button>
+      <ul id="scriptList" class="script-list"></ul>
+      <div class="library-foot">
+        <label class="btn btn-ghost full file-btn">
+          Importar .txt / .md
+          <input id="importFile" type="file" accept=".txt,.md,text/plain,text/markdown" hidden />
+        </label>
+        <button id="exportScript" class="btn btn-ghost full">Descargar guion</button>
+      </div>
+    </aside>
+
+    <section class="workspace">
+      <header class="workspace-head">
+        <input id="scriptTitle" class="title-input" type="text" placeholder="Título del guion" maxlength="80" />
+        <div class="head-actions">
+          <button id="deleteScript" class="btn btn-ghost danger" title="Eliminar guion">Eliminar</button>
+          <button id="startBtn" class="btn btn-primary">▶ Iniciar teleprompter</button>
+        </div>
+      </header>
+
+      <textarea id="scriptText" class="script-text" spellcheck="true" placeholder="Escribe o pega tu guion aquí…"></textarea>
+
+      <footer class="workspace-foot">
+        <div id="stats" class="stats"></div>
+        <div class="syntax">
+          <code># Título</code> sección ·
+          <code>**texto**</code> énfasis ·
+          <code>[nota]</code> indicación (no se lee) ·
+          línea en blanco = párrafo
+        </div>
+      </footer>
+    </section>
+
+    <aside class="settings">
+      <h2>Ajustes</h2>
+
+      <div class="field">
+        <label for="sSpeed">Velocidad <output id="oSpeed"></output></label>
+        <input id="sSpeed" type="range" min="0.5" max="30" step="0.5" />
+      </div>
+      <div class="field">
+        <label for="sFont">Tamaño de letra <output id="oFont"></output></label>
+        <input id="sFont" type="range" min="20" max="160" step="2" />
+      </div>
+      <div class="field">
+        <label for="sLine">Interlineado <output id="oLine"></output></label>
+        <input id="sLine" type="range" min="1" max="2.4" step="0.05" />
+      </div>
+      <div class="field">
+        <label for="sWidth">Ancho del texto <output id="oWidth"></output></label>
+        <input id="sWidth" type="range" min="30" max="100" step="1" />
+      </div>
+      <div class="field">
+        <label for="sGuide">Línea de lectura <output id="oGuide"></output></label>
+        <input id="sGuide" type="range" min="10" max="80" step="1" />
+      </div>
+      <div class="field">
+        <label for="sCountdown">Cuenta regresiva <output id="oCountdown"></output></label>
+        <input id="sCountdown" type="range" min="0" max="10" step="1" />
+      </div>
+
+      <div class="field row">
+        <label for="sFamily">Fuente</label>
+        <select id="sFamily">
+          <option value="sans">Sans</option>
+          <option value="serif">Serif</option>
+          <option value="mono">Mono</option>
+        </select>
+      </div>
+      <div class="field row">
+        <label for="sAlign">Alineación</label>
+        <select id="sAlign">
+          <option value="left">Izquierda</option>
+          <option value="center">Centro</option>
+          <option value="justify">Justificado</option>
+        </select>
+      </div>
+      <div class="field row colors">
+        <label>Colores</label>
+        <span>
+          <input id="sColor" type="color" title="Texto" />
+          <input id="sBg" type="color" title="Fondo" />
+          <input id="sAccent" type="color" title="Resaltado" />
+        </span>
+      </div>
+
+      <div class="toggles">
+        <label class="toggle"><input id="sMirrorX" type="checkbox" /> <span>Espejo horizontal</span></label>
+        <label class="toggle"><input id="sMirrorY" type="checkbox" /> <span>Espejo vertical</span></label>
+        <label class="toggle"><input id="sShowGuide" type="checkbox" /> <span>Mostrar guía</span></label>
+        <label class="toggle"><input id="sFade" type="checkbox" /> <span>Difuminar bordes</span></label>
+        <label class="toggle"><input id="sFocus" type="checkbox" /> <span>Atenuar párrafos inactivos</span></label>
+        <label class="toggle"><input id="sUpper" type="checkbox" /> <span>MAYÚSCULAS</span></label>
+      </div>
+
+      <div class="field row">
+        <label for="sLang">Idioma de voz</label>
+        <select id="sLang">
+          <option value="es-ES">Español (España)</option>
+          <option value="es-MX">Español (México)</option>
+          <option value="es-CO">Español (Colombia)</option>
+          <option value="es-AR">Español (Argentina)</option>
+          <option value="es-US">Español (EE. UU.)</option>
+          <option value="en-US">English (US)</option>
+          <option value="en-GB">English (UK)</option>
+          <option value="pt-BR">Português (BR)</option>
+          <option value="fr-FR">Français</option>
+        </select>
+      </div>
+      <p class="hint">El <strong>modo voz</strong> avanza el texto mientras hablas (Chrome / Edge). Actívalo con <kbd>V</kbd> dentro del teleprompter.</p>
+      <button id="resetSettings" class="btn btn-ghost full">Restablecer ajustes</button>
+    </aside>
+  </main>
+
+  <!-- ============ PROMPTER ============ -->
+  <section id="prompter" class="prompter" hidden>
+    <div id="stage" class="stage">
+      <div id="content" class="content"></div>
+      <div class="fade fade-top"></div>
+      <div class="fade fade-bottom"></div>
+      <div id="guide" class="guide">
+        <span class="guide-arrow left">▶</span>
+        <span class="guide-arrow right">◀</span>
+      </div>
+    </div>
+
+    <div id="progress" class="progress"><div id="progressBar"></div></div>
+
+    <div id="countdown" class="countdown" hidden></div>
+    <div id="endBadge" class="end-badge" hidden>Fin del guion · <kbd>R</kbd> para reiniciar</div>
+
+    <div id="hud" class="hud">
+      <div class="hud-group">
+        <button data-act="editor" class="hud-btn" title="Volver al editor (Esc)">✕</button>
+        <button data-act="restart" class="hud-btn" title="Reiniciar (R)">⏮</button>
+        <button data-act="prev" class="hud-btn" title="Párrafo anterior (RePág)">⏪</button>
+        <button data-act="play" id="playBtn" class="hud-btn big" title="Reproducir / pausar (Espacio)">▶</button>
+        <button data-act="next" class="hud-btn" title="Párrafo siguiente (AvPág)">⏩</button>
+      </div>
+
+      <div class="hud-group">
+        <button data-act="slower" class="hud-btn" title="Más lento (↓)">−</button>
+        <div class="hud-meter"><small>Velocidad</small><strong id="hudSpeed"></strong></div>
+        <button data-act="faster" class="hud-btn" title="Más rápido (↑)">+</button>
+      </div>
+
+      <div class="hud-group">
+        <button data-act="smaller" class="hud-btn" title="Letra más pequeña (−)">A−</button>
+        <div class="hud-meter"><small>Letra</small><strong id="hudFont"></strong></div>
+        <button data-act="bigger" class="hud-btn" title="Letra más grande (+)">A+</button>
+      </div>
+
+      <div class="hud-group times">
+        <div class="hud-meter"><small>Transcurrido</small><strong id="hudElapsed">0:00</strong></div>
+        <div class="hud-meter"><small>Restante</small><strong id="hudRemaining">0:00</strong></div>
+      </div>
+
+      <div class="hud-group">
+        <button data-act="voice" id="voiceBtn" class="hud-btn" title="Modo voz (V)">🎙</button>
+        <button data-act="mirrorX" id="mirrorXBtn" class="hud-btn" title="Espejo horizontal (M)">⇋</button>
+        <button data-act="mirrorY" id="mirrorYBtn" class="hud-btn" title="Espejo vertical (Shift+M)">⇵</button>
+        <button data-act="fullscreen" class="hud-btn" title="Pantalla completa (F)">⛶</button>
+        <button data-act="help" class="hud-btn" title="Atajos (?)">?</button>
+      </div>
+    </div>
+
+    <div id="voiceStatus" class="voice-status" hidden><span class="pulse"></span> Escuchando…</div>
+
+    <div id="help" class="help" hidden>
+      <div class="help-card">
+        <h3>Atajos de teclado</h3>
+        <dl>
+          <dt><kbd>Espacio</kbd></dt><dd>Reproducir / pausar</dd>
+          <dt><kbd>↑</kbd> <kbd>↓</kbd></dt><dd>Velocidad + / −</dd>
+          <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Retroceder / avanzar una línea</dd>
+          <dt><kbd>RePág</kbd> <kbd>AvPág</kbd></dt><dd>Párrafo anterior / siguiente</dd>
+          <dt><kbd>+</kbd> <kbd>−</kbd></dt><dd>Tamaño de letra</dd>
+          <dt><kbd>1</kbd>…<kbd>9</kbd></dt><dd>Velocidad preestablecida</dd>
+          <dt><kbd>V</kbd></dt><dd>Modo voz (sigue lo que dices)</dd>
+          <dt><kbd>M</kbd> / <kbd>Shift</kbd>+<kbd>M</kbd></dt><dd>Espejo horizontal / vertical</dd>
+          <dt><kbd>F</kbd></dt><dd>Pantalla completa</dd>
+          <dt><kbd>R</kbd> / <kbd>Inicio</kbd></dt><dd>Reiniciar</dd>
+          <dt><kbd>Esc</kbd></dt><dd>Volver al editor</dd>
+          <dt>Rueda / arrastrar</dt><dd>Desplazar manualmente</dd>
+          <dt>Clic</dt><dd>Reproducir / pausar (en modo voz: saltar a la palabra)</dd>
+        </dl>
+        <button data-act="help" class="btn btn-primary full">Entendido</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

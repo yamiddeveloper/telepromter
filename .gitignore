@@ -1,0 +1,12 @@
+# Sistema
+.DS_Store
+Thumbs.db
+*~
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# Claude Code (ajustes locales)
+.claude/settings.local.json
